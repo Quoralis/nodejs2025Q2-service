@@ -1,4 +1,5 @@
 import { Db } from '../types/db.interface';
+import { timeNow } from '../helpers/time.helper';
 
 export const db: Db = {
   users: [
@@ -7,8 +8,8 @@ export const db: Db = {
       login: 'RS',
       password: '123',
       version: 0,
-      createdAt: 12313123,
-      updatedAt: 12313123,
+      createdAt: timeNow(),
+      updatedAt: timeNow(),
     },
   ],
   albums: [],

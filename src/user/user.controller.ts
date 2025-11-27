@@ -1,6 +1,16 @@
-import { Controller, Get, Param, ParseUUIDPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { UserService } from './user.service';
-import { isUUID } from 'class-validator';
+import { CreateUserDto } from './dto/createUser.dto';
+import { UpdatePasswordDto } from './dto/updatePassword.dto';
 
 @Controller('users')
 export class UserController {
@@ -14,5 +24,19 @@ export class UserController {
   @Get(':id')
   getOne(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     return this.userService.findById(id);
+  }
+  @Post()
+  @HttpCode(201)
+  createUser(@Body() dto: CreateUserDto) {
+    return this.userService.createUser(dto);
+  }
+
+  @Put(':id')
+  @HttpCode(200)
+  updatePassword(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Body() dto: UpdatePasswordDto,
+  ) {
+    return this.userService.updatePassword(id, dto);
   }
 }
