@@ -1,10 +1,11 @@
 import { Db } from '../types/db.interface';
 import { timeNow } from '../helpers/time.helper';
+import { randomUUID } from 'crypto';
 
 export const db: Db = {
   users: [
     {
-      id: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d',
+      id: randomUUID(),
       login: 'RS',
       password: '123',
       version: 0,
@@ -14,5 +15,13 @@ export const db: Db = {
   ],
   albums: [],
   artists: [],
-  tracks: [],
+  tracks: [
+    {
+      id: randomUUID(),
+      name: 'Seven Days',
+      artistId: 'Sting',
+      albumId: 'Sting 3.0',
+      duration: 300,
+    },
+  ],
 };
