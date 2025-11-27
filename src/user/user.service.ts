@@ -51,6 +51,7 @@ export class UserService {
     delete safeUser.password;
     return safeUser;
   }
+
   updatePassword(id: string, dto: UpdatePasswordDto) {
     const user = db.users.find((u) => u.id === id);
     if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
@@ -63,5 +64,12 @@ export class UserService {
 
     delete safeUser.password;
     return safeUser;
+  }
+
+  deleteUser(id: string) {
+    const indexUser = db.users.findIndex((u) => u.id === id);
+    if (indexUser === -1)
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    db.users.splice(indexUser, 1);
   }
 }
