@@ -22,7 +22,7 @@ export class TrackController {
   }
 
   @Get(':id')
-  getTrack(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+  getOne(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     return this.trackService.findById(id);
   }
 

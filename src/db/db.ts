@@ -13,8 +13,21 @@ export const db: Db = {
       updatedAt: timeNow(),
     },
   ],
-  albums: [],
-  artists: [],
+  albums: [
+    {
+      id: randomUUID(),
+      name: 'Ten Summoner’s Tale',
+      year: 1993,
+      artistId: 'Sting',
+    },
+  ],
+  artists: [
+    {
+      id: randomUUID(),
+      name: 'Sting',
+      grammy: true,
+    },
+  ],
   tracks: [
     {
       id: randomUUID(),

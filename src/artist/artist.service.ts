@@ -1,0 +1,50 @@
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { db } from '../db/db';
+import { Artist } from '../types/artist.interface';
+import { randomUUID } from 'crypto';
+import { CreateArtistDto } from './dto/createArtist.dto';
+
+@Injectable()
+export class ArtistService {
+  findAllArtist() {
+    return db.artists;
+  }
+
+  findById(id: string) {
+    const artist = db.artists.find((a) => a.id === id);
+    if (!artist) {
+      throw new HttpException('No artist found', HttpStatus.NOT_FOUND);
+    }
+    return artist;
+  }
+
+  createArtist(dto: CreateArtistDto) {
+    const newArtist: Artist = {
+      id: randomUUID(),
+      ...dto,
+    };
+    db.artists.push(newArtist);
+    return newArtist;
+  }
+
+  updateArtist(id: string, dto: CreateArtistDto) {
+    const indexArtist = db.artists.findIndex((a) => a.id === id);
+    if (indexArtist === -1)
+      throw new HttpException('No artist found', HttpStatus.NOT_FOUND);
+    const updatedArtist = {
+      id: id,
+      ...dto,
+    };
+    db.artists.splice(indexArtist, 1, updatedArtist);
+    return updatedArtist;
+  }
+  deleteArtist(id: string) {
+    const indexArtist = db.artists.findIndex((a) => a.id === id);
+
+    if (indexArtist === -1) {
+      throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
+    }
+
+    db.artists.splice(indexArtist, 1);
+  }
+}
