@@ -65,6 +65,10 @@ export class ArtistService {
       }
     });
 
+    db.favorites.artists = db.favorites.artists.filter(
+      (artistId) => artistId !== id,
+    );
+
     db.artists.splice(indexArtist, 1);
   }
 }

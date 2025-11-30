@@ -10,7 +10,6 @@ import {
   Put,
 } from '@nestjs/common';
 import { ArtistService } from './artist.service';
-import { version } from 'uuid';
 import { CreateArtistDto } from './dto/createArtist.dto';
 
 @Controller('artist')

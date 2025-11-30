@@ -78,6 +78,10 @@ export class AlbumsService {
       }
     });
 
+    db.favorites.albums = db.favorites.albums.filter(
+      (albumId) => albumId !== id,
+    );
+
     db.albums.splice(indexAlbum, 1);
   }
 }

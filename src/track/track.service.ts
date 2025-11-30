@@ -39,7 +39,13 @@ export class TrackService {
   }
   deleteTrack(id: string) {
     const indexTrack = db.tracks.findIndex((track) => track.id === id);
-    if (indexTrack == -1) throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
+    if (indexTrack == -1)
+      throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
+
+    db.favorites.tracks = db.favorites.tracks.filter(
+      (idTrack) => idTrack !== id,
+    );
+
     db.tracks.splice(indexTrack, 1);
   }
 }

@@ -14,8 +14,7 @@ import { CreateAlbumDto } from './dto/createAlbumDto';
 
 @Controller('album')
 export class AlbumsController {
-  constructor(private readonly albumsService: AlbumsService) {
-  }
+  constructor(private readonly albumsService: AlbumsService) {}
 
   @Get()
   getAllAlbums() {
