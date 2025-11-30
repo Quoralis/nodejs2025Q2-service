@@ -1,6 +1,7 @@
 import { Db } from '../types/db.interface';
 import { timeNow } from '../helpers/time.helper';
 import { randomUUID } from 'crypto';
+import { Favorites } from '../types/favorites.interface';
 
 export const db: Db = {
   users: [
@@ -37,4 +38,9 @@ export const db: Db = {
       duration: 300,
     },
   ],
+  favorites: <Favorites>{
+    artists: [],
+    albums: [],
+    tracks: [],
+  },
 };

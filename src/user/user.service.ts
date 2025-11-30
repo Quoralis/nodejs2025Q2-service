@@ -43,7 +43,7 @@ export class UserService {
       password: dto.password,
       createdAt: timeNow(),
       updatedAt: timeNow(),
-      version: 0,
+      version: 1,
     };
     db.users.push(newUser);
     const safeUser = { ...newUser };
