@@ -1,0 +1,28 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: home-lib-app
+    ports:
+      - "4000:4000"
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    networks:
+      - appnet
+
+  postgres:
+    build:
+      context: .
+      dockerfile: DockerfileDb
+    container_name: home-lib-db
+    ports:
+      - "5432:5432"
+    networks:
+      - appnet
+
+networks:
+  appnet:
+    driver: bridge
