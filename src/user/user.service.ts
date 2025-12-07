@@ -3,7 +3,7 @@ import { CreateUserDto } from './dto/createUser.dto';
 import { randomUUID } from 'crypto';
 import { UpdatePasswordDto } from './dto/updatePassword.dto';
 import { timeNow } from '../helpers/time.helper';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class UserService {
@@ -41,6 +41,7 @@ export class UserService {
   }
 
   async createUser(dto: CreateUserDto) {
+    const now = Math.floor(Date.now() / 1000);
     if (!dto.login || !dto.password) {
       throw new HttpException(
         'required login and password in body',
@@ -52,8 +53,8 @@ export class UserService {
         id: randomUUID(),
         login: dto.login,
         password: dto.password,
-        createdAt: timeNow(),
-        updatedAt: timeNow(),
+        createdAt: now,
+        updatedAt: now,
         version: 1,
       },
     });
@@ -101,5 +102,4 @@ export class UserService {
 
     await this.prisma.user.delete({ where: { id } });
   }
-
 }
