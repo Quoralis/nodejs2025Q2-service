@@ -1,31 +1,44 @@
-/*
-  Warnings:
+-- CreateTable
+CREATE TABLE "user" (
+    "id" TEXT NOT NULL,
+    "login" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "version" INTEGER NOT NULL DEFAULT 1,
+    "createdAt" INTEGER NOT NULL,
+    "updatedAt" INTEGER NOT NULL,
 
-  - The primary key for the `albums` table will be changed. If it partially fails, the table could be left without primary key constraint.
-  - The primary key for the `artists` table will be changed. If it partially fails, the table could be left without primary key constraint.
-  - The primary key for the `tracks` table will be changed. If it partially fails, the table could be left without primary key constraint.
-  - The primary key for the `users` table will be changed. If it partially fails, the table could be left without primary key constraint.
+    CONSTRAINT "user_pkey" PRIMARY KEY ("id")
+);
 
-*/
--- AlterTable
-ALTER TABLE "albums" DROP CONSTRAINT "albums_pkey",
-ALTER COLUMN "id" SET DATA TYPE TEXT,
-ADD CONSTRAINT "albums_pkey" PRIMARY KEY ("id");
+-- CreateTable
+CREATE TABLE "artists" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "grammy" BOOLEAN NOT NULL,
 
--- AlterTable
-ALTER TABLE "artists" DROP CONSTRAINT "artists_pkey",
-ALTER COLUMN "id" SET DATA TYPE TEXT,
-ADD CONSTRAINT "artists_pkey" PRIMARY KEY ("id");
+    CONSTRAINT "artists_pkey" PRIMARY KEY ("id")
+);
 
--- AlterTable
-ALTER TABLE "tracks" DROP CONSTRAINT "tracks_pkey",
-ALTER COLUMN "id" SET DATA TYPE TEXT,
-ADD CONSTRAINT "tracks_pkey" PRIMARY KEY ("id");
+-- CreateTable
+CREATE TABLE "tracks" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "artistId" TEXT,
+    "albumId" TEXT,
+    "duration" INTEGER NOT NULL,
 
--- AlterTable
-ALTER TABLE "users" DROP CONSTRAINT "users_pkey",
-ALTER COLUMN "id" SET DATA TYPE TEXT,
-ADD CONSTRAINT "users_pkey" PRIMARY KEY ("id");
+    CONSTRAINT "tracks_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "albums" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "year" INTEGER NOT NULL,
+    "artistId" TEXT,
+
+    CONSTRAINT "albums_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "favorites" (
