@@ -18,6 +18,10 @@ services:
       context: .
       dockerfile: DockerfileDb
     container_name: home-lib-db
+    environment:
+      POSTGRES_USER: St
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: home_library
     ports:
       - "5432:5432"
     networks:

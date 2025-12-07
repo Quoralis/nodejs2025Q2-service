@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id        String @id @default(uuid())
+  login     String
+  password  String
+  version   Int    @default(1)
+  createdAt Int
+  updatedAt Int
+
+  @@map("users")
+}
+
+model Artists {
+  id              String           @id @default(uuid())
+  name            String
+  grammy          Boolean
+  tracks          Tracks[]
+  albums          Albums[]
+  artistFavorites ArtistFavorite[]
+
+  @@map("artists")
+}
+
+model Tracks {
+  id       String  @id @default(uuid())
+  name     String
+  artistId String?
+  albumId  String?
+  duration Int
+
+  artist         Artists?        @relation(fields: [artistId], references: [id], onDelete: SetNull)
+  album          Albums?         @relation(fields: [albumId], references: [id], onDelete: SetNull)
+  trackFavorites TrackFavorite[]
+
+  @@map("tracks")
+}
+
+model Albums {
+  id       String  @id @default(uuid())
+  name     String
+  year     Int
+  artistId String?
+
+  artist         Artists?        @relation(fields: [artistId], references: [id], onDelete: SetNull)
+  tracks         Tracks[]
+  albumFavorites AlbumFavorite[]
+
+  @@map("albums")
+}
+
+model Favorites {
+  id      String           @id @default(uuid())
+  artists ArtistFavorite[] @relation("ArtistFavs")
+  albums  AlbumFavorite[]  @relation("AlbumFavs")
+  tracks  TrackFavorite[]  @relation("TrackFavs")
+
+  @@map("favorites")
+}
+
+model ArtistFavorite {
+  id          String @id @default(uuid())
+  artistId    String
+  favoritesId String
+
+  artist    Artists   @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  favorites Favorites @relation(name: "ArtistFavs", fields: [favoritesId], references: [id], onDelete: Cascade)
+
+  @@map("artist_favorites")
+}
+
+model AlbumFavorite {
+  id          String @id @default(uuid())
+  albumId     String
+  favoritesId String
+
+  album     Albums    @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  favorites Favorites @relation(name: "AlbumFavs", fields: [favoritesId], references: [id], onDelete: Cascade)
+
+  @@map("album_favorites")
+}
+
+model TrackFavorite {
+  id          String @id @default(uuid())
+  trackId     String
+  favoritesId String
+
+  track     Tracks    @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  favorites Favorites @relation(name: "TrackFavs", fields: [favoritesId], references: [id], onDelete: Cascade)
+
+  @@map("track_favorites")
+}
