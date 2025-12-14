@@ -21,6 +21,13 @@ export class UserService {
     });
   }
 
+  async findOneUser(login: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { login },
+    });
+    return user;
+  }
+
   async findById(id: string) {
     const user = await this.prisma.user.findUnique({
       where: { id },
