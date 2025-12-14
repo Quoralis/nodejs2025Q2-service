@@ -69,5 +69,32 @@ export class AuthService {
 
     return { message: 'User created successfully' };
   }
+  async refresh(refreshToken: string) {
+    try {
+      const payload = jwt.verify(
+        refreshToken,
+        process.env.JWT_REFRESH_SECRET as Secret,
+      ) as JwtPayload;
 
+      const newPayload = {
+        userId: payload.userId,
+        login: payload.login,
+      };
+
+      return {
+        accessToken: jwt.sign(
+          newPayload,
+          process.env.JWT_ACCESS_SECRET as Secret,
+          { expiresIn: Number(process.env.JWT_ACCESS_EXPIRES_IN) },
+        ),
+        refreshToken: jwt.sign(
+          newPayload,
+          process.env.JWT_REFRESH_SECRET as Secret,
+          { expiresIn: Number(process.env.JWT_REFRESH_EXPIRES_IN) },
+        ),
+      };
+    } catch {
+      throw new ForbiddenException('Invalid refresh token');
+    }
+  }
 }
