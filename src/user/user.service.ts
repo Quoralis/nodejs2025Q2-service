@@ -4,6 +4,7 @@ import { randomUUID } from 'crypto';
 import { UpdatePasswordDto } from './dto/updatePassword.dto';
 import { timeNow } from '../helpers/time.helper';
 import { PrismaService } from '../prisma/prisma.service';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UserService {
@@ -19,6 +20,13 @@ export class UserService {
         updatedAt: true,
       },
     });
+  }
+
+  async findOneUser(login: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { login },
+    });
+    return user;
   }
 
   async findById(id: string) {
@@ -39,20 +47,23 @@ export class UserService {
 
     return user;
   }
-
   async createUser(dto: CreateUserDto) {
     const now = Math.floor(Date.now() / 1000);
+
     if (!dto.login || !dto.password) {
       throw new HttpException(
         'required login and password in body',
         HttpStatus.BAD_REQUEST,
       );
     }
+
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+
     const newUser = await this.prisma.user.create({
       data: {
         id: randomUUID(),
         login: dto.login,
-        password: dto.password,
+        password: hashedPassword,
         createdAt: now,
         updatedAt: now,
         version: 1,
@@ -60,7 +71,6 @@ export class UserService {
     });
 
     const safeUser = { ...newUser };
-
     delete safeUser.password;
     return safeUser;
   }
@@ -69,6 +79,7 @@ export class UserService {
     if (!dto.oldPassword || !dto.newPassword) {
       throw new HttpException('Invalid dto', HttpStatus.BAD_REQUEST);
     }
+
     const existingUser = await this.prisma.user.findUnique({
       where: { id },
     });
@@ -76,13 +87,22 @@ export class UserService {
     if (!existingUser) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
-    if (existingUser.password !== dto.oldPassword) {
+
+    const passwordMatch = await bcrypt.compare(
+      dto.oldPassword,
+      existingUser.password,
+    );
+
+    if (!passwordMatch) {
       throw new HttpException('Password not match', HttpStatus.FORBIDDEN);
     }
+
+    const newHashedPassword = await bcrypt.hash(dto.newPassword, 10);
+
     const updatedUser = await this.prisma.user.update({
       where: { id },
       data: {
-        password: dto.newPassword,
+        password: newHashedPassword,
         updatedAt: timeNow(),
         version: existingUser.version + 1,
       },
@@ -101,5 +121,7 @@ export class UserService {
     }
 
     await this.prisma.user.delete({ where: { id } });
+
+    return { message: 'User deleted successfully' };
   }
 }
