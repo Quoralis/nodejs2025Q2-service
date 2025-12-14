@@ -6,7 +6,8 @@ import {
 import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
-import { Secret, SignOptions } from 'jsonwebtoken';
+import { Secret } from 'jsonwebtoken';
+import { getExpiresIn } from '../helpers/getExpiresIn';
 
 type JwtPayload = {
   userId: string;
@@ -19,7 +20,6 @@ export class AuthService {
 
   async signIn(login: string, password: string) {
     const user = await this.userService.findOneUser(login);
-
     if (!user) {
       throw new ForbiddenException('Invalid login or password');
     }
@@ -41,40 +41,57 @@ export class AuthService {
       throw new InternalServerErrorException('JWT secrets are not configured');
     }
 
-    const accessOptions: SignOptions = {
-      expiresIn: Number(process.env.JWT_ACCESS_EXPIRES_IN ?? 300),
+    const accessExpiresIn = getExpiresIn(
+      process.env.JWT_ACCESS_EXPIRES_IN,
+      3600,
+    );
+
+    const refreshExpiresIn = getExpiresIn(
+      process.env.JWT_REFRESH_EXPIRES_IN,
+      86400,
+    );
+
+    return {
+      accessToken: jwt.sign(payload, accessSecret, {
+        expiresIn: accessExpiresIn,
+      }),
+      refreshToken: jwt.sign(payload, refreshSecret, {
+        expiresIn: refreshExpiresIn,
+      }),
     };
-
-    const refreshOptions: SignOptions = {
-      expiresIn: Number(process.env.JWT_REFRESH_EXPIRES_IN ?? 604800),
-    };
-
-    const accessToken = jwt.sign(payload, accessSecret, accessOptions);
-    const refreshToken = jwt.sign(payload, refreshSecret, refreshOptions);
-
-    return { accessToken, refreshToken };
   }
+
   async signUp(login: string, password: string) {
     const existing = await this.userService.findOneUser(login);
     if (existing) {
       throw new ForbiddenException('User already exists');
     }
 
-    const hash = await bcrypt.hash(password, 10);
+    const saltRounds = Number(process.env.CRYPT_SALT ?? 10);
+    const hash = await bcrypt.hash(password, saltRounds);
 
-    await this.userService.createUser({
-      login,
-      password: hash,
-    });
+    await this.userService.createUser({ login, password: hash });
 
     return { message: 'User created successfully' };
   }
+
+
   async refresh(refreshToken: string) {
     try {
       const payload = jwt.verify(
         refreshToken,
         process.env.JWT_REFRESH_SECRET as Secret,
       ) as JwtPayload;
+
+      const accessExpiresIn = getExpiresIn(
+        process.env.JWT_ACCESS_EXPIRES_IN,
+        3600,
+      );
+
+      const refreshExpiresIn = getExpiresIn(
+        process.env.JWT_REFRESH_EXPIRES_IN,
+        86400,
+      );
 
       const newPayload = {
         userId: payload.userId,
@@ -85,12 +102,12 @@ export class AuthService {
         accessToken: jwt.sign(
           newPayload,
           process.env.JWT_ACCESS_SECRET as Secret,
-          { expiresIn: Number(process.env.JWT_ACCESS_EXPIRES_IN) },
+          { expiresIn: accessExpiresIn },
         ),
         refreshToken: jwt.sign(
           newPayload,
           process.env.JWT_REFRESH_SECRET as Secret,
-          { expiresIn: Number(process.env.JWT_REFRESH_EXPIRES_IN) },
+          { expiresIn: refreshExpiresIn },
         ),
       };
     } catch {
